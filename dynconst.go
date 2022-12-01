@@ -141,11 +141,46 @@ func Walk(fn func(key string, value Var)) {
 }
 
 // Handler returns the dynconst HTTP Handler.
-func Handler() http.Handler {
-	return http.HandlerFunc(viewHandler)
+func Handler(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		ViewHandler(w, r)
+	case http.MethodPost:
+		SetHandler(w, r)
+	default:
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
 }
 
-func viewHandler(w http.ResponseWriter, r *http.Request) {
+func SetHandler(w http.ResponseWriter, r *http.Request) {
+	params := r.URL.Query()
+	name := params.Get("name")
+	value := params.Get("value")
+
+	if name == "" || value == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	v, ok := vars.Load(name)
+	if !ok {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	val, ok := v.(interface{ set(string) error })
+	if !ok {
+		panic("unreachable")
+	}
+
+	if err := val.set(value); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+}
+
+func ViewHandler(w http.ResponseWriter, r *http.Request) {
 	switch format := r.URL.Query().Get("format"); format {
 	case "", "json":
 		writeJSON(w)
