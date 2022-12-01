@@ -24,8 +24,9 @@ type Int struct {
 	i int64
 }
 
-func NewInt(name string) *Int {
+func NewInt(value int64, name string) *Int {
 	v := new(Int)
+	atomic.StoreInt64(&v.i, value)
 	publish(name, v)
 	return v
 }
@@ -47,8 +48,9 @@ type Float struct {
 	f atomic.Uint64
 }
 
-func NewFloat(name string) *Float {
+func NewFloat(value float64, name string) *Float {
 	v := new(Float)
+	v.f.Store(math.Float64bits(value))
 	publish(name, v)
 	return v
 }
@@ -70,8 +72,9 @@ type String struct {
 	s atomic.Value
 }
 
-func NewString(name string) *String {
+func NewString(value, name string) *String {
 	v := new(String)
+	v.s.Store(value)
 	publish(name, v)
 	return v
 }
