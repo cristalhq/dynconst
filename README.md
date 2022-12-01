@@ -29,7 +29,14 @@ go get github.com/cristalhq/dynconst
 ## Example
 
 ```go
-TODO
+var batchSize = dynconst.NewInt(10, "batch_size")
+
+// ...
+
+batchSize := batchSize.Value()
+for len(batch) < batchSize {
+	batch = append(batch, someValue)
+}
 ```
 
 See examples: [example_test.go](example_test.go).
