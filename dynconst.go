@@ -127,16 +127,16 @@ func publish(name string, v Var) {
 	sort.Strings(varKeys)
 }
 
-// Do calls f for each exported variable.
+// Walk calls fn for each exported variable.
 // The global variable map is locked during the iteration,
 // but existing entries may be concurrently updated.
-func Do(f func(key string, value Var)) {
+func Walk(fn func(key string, value Var)) {
 	varKeysMu.RLock()
 	defer varKeysMu.RUnlock()
 
 	for _, key := range varKeys {
 		value, _ := vars.Load(key)
-		f(key, value.(Var))
+		fn(key, value.(Var))
 	}
 }
 
@@ -162,7 +162,7 @@ func writeJSON(w http.ResponseWriter) {
 
 	fmt.Fprintf(w, "{\n")
 	first := true
-	Do(func(key string, value Var) {
+	Walk(func(key string, value Var) {
 		if !first {
 			fmt.Fprintf(w, ",\n")
 		}
@@ -176,7 +176,7 @@ func writeText(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 	first := true
-	Do(func(key string, value Var) {
+	Walk(func(key string, value Var) {
 		if !first {
 			fmt.Fprintf(w, ",\n")
 		}
