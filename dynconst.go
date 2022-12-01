@@ -136,7 +136,7 @@ func Handler() http.Handler {
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	switch format := r.URL.Query().Get("format"); format {
-	case "json":
+	case "", "json":
 		writeJSON(w)
 	case "text":
 		writeText(w)
