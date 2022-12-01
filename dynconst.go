@@ -39,6 +39,15 @@ func (v *Int) Value() int64 {
 	return atomic.LoadInt64(&v.i)
 }
 
+func (v *Int) set(s string) error {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		return err
+	}
+	atomic.StoreInt64(&v.i, i)
+	return nil
+}
+
 // Float is a 64-bit float variable that satisfies the Var interface.
 type Float struct {
 	f atomic.Uint64
@@ -57,6 +66,15 @@ func (v *Float) String() string {
 
 func (v *Float) Value() float64 {
 	return math.Float64frombits(v.f.Load())
+}
+
+func (v *Float) set(s string) error {
+	f, err := strconv.ParseFloat(s, 64)
+	if err != nil {
+		return err
+	}
+	v.f.Store(math.Float64bits(f))
+	return nil
 }
 
 // String is a string variable, and satisfies the Var interface.
@@ -81,6 +99,11 @@ func (v *String) String() string {
 func (v *String) Value() string {
 	p, _ := v.s.Load().(string)
 	return p
+}
+
+func (v *String) set(s string) error {
+	v.s.Store(s)
+	return nil
 }
 
 var (
