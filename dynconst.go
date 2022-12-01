@@ -38,9 +38,9 @@ func (v *Int) Value() int64 {
 	return atomic.LoadInt64(&v.i)
 }
 
-func (v *Int) Set(value int64) {
-	atomic.StoreInt64(&v.i, value)
-}
+// func (v *Int) Set(value int64) {
+// 	atomic.StoreInt64(&v.i, value)
+// }
 
 // Float is a 64-bit float variable that satisfies the Var interface.
 type Float struct {
@@ -61,9 +61,9 @@ func (v *Float) Value() float64 {
 	return math.Float64frombits(v.f.Load())
 }
 
-func (v *Float) Set(value float64) {
-	v.f.Store(math.Float64bits(value))
-}
+// func (v *Float) Set(value float64) {
+// 	v.f.Store(math.Float64bits(value))
+// }
 
 // String is a string variable, and satisfies the Var interface.
 type String struct {
@@ -88,9 +88,9 @@ func (v *String) Value() string {
 	return p
 }
 
-func (v *String) Set(value string) {
-	v.s.Store(value)
-}
+// func (v *String) Set(value string) {
+// 	v.s.Store(value)
+// }
 
 var (
 	vars      sync.Map
